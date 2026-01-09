@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import authRoutes from './src/routes/auth.routes.js';
 import { dbConnect } from "./src/db.js";
+import cookieParser from "cookie-parser";
 // import adminLoginRouter from './routes/adminLoginRouter.js';
 // import memeberShareRouter from './routes/memeberShareRouter.js';
 // import memberTransactionsRouter from './routes/memberTransactionsRouter.js';
@@ -26,6 +27,8 @@ const corsOptions = {
 
 // Enable CORS globally
 app.use(cors(corsOptions));
+
+app.use(cookieParser());
 
 // Apply CORS to preflight (OPTIONS) requests as well
 // app.options('*', cors(corsOptions));
