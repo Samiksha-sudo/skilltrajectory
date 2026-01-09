@@ -1,15 +1,17 @@
 import express from 'express';
 import cors from 'cors';
-// import memberRoutes from './routes/memberRoutes.js';
+import authRoutes from './src/routes/auth.routes.js';
+import { dbConnect } from "./src/db.js";
 // import adminLoginRouter from './routes/adminLoginRouter.js';
 // import memeberShareRouter from './routes/memeberShareRouter.js';
 // import memberTransactionsRouter from './routes/memberTransactionsRouter.js';
 // import requestLoan from './routes/requestLoan.js';
 // import memberdetails from './routes/memberDetailsRoutes.js';
 
-const PORT = 9000;
-const app = express();
+const PORT = process.env.PORT;
 
+const app = express();
+await dbConnect();
 // Define CORS options
 const corsOptions = {
     origin: [
@@ -25,28 +27,29 @@ const corsOptions = {
 // Enable CORS globally
 app.use(cors(corsOptions));
 
-// // Apply CORS to preflight (OPTIONS) requests as well
+// Apply CORS to preflight (OPTIONS) requests as well
 // app.options('*', cors(corsOptions));
 
-// // Middleware to log incoming requests (for debugging)
+// Middleware to log incoming requests (for debugging)
 app.use((req, res, next) => {
     console.log(`Request Method: ${req.method}, Request URL: ${req.url}`);
     next();
 });
 
-// // Parse JSON bodies
+// Parse JSON bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// // Route handling
-// // app.use("/member", memberRoutes);
-// // app.use("/admin/login", adminLoginRouter);
-// // app.use("/member/shares", memeberShareRouter);
-// // app.use("/member/loan", memberTransactionsRouter);
-// // app.use("/member/requestLoan", requestLoan);
-// // app.use("/member/memberdetails", memberdetails);
+// Route handling
+app.use("/api/auth", authRoutes);
+// app.use("/member", memberRoutes);
+// app.use("/admin/login", adminLoginRouter);
+// app.use("/member/shares", memeberShareRouter);
+// app.use("/member/loan", memberTransactionsRouter);
+// app.use("/member/requestLoan", requestLoan);
+// app.use("/member/memberdetails", memberdetails);
 
-// // Error handling middleware
+// Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Something broke!');

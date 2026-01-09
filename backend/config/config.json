@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "skillapp",
+    "password": "SkillApp@123",
+    "database": "skilltrajectory",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "skillapp",
+    "password": "SkillApp@123",
+    "database": "skilltrajectory",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "skillapp",
+    "password": "SkillApp@123",
+    "database": "skilltrajectory",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}
