@@ -44,8 +44,8 @@ export default function LoginPage() {
 
       setMsg({ type: "success", text: data?.message || "Login successful" });
 
-      // For S02 we just confirm session; redirect can be S03 (dashboard)
-      // window.location.href = "/dashboard";
+
+      window.location.href = "/dashboard";
     } finally {
       setLoading(false);
     }
