@@ -24,3 +24,147 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ===== AI Robot Background (Blurred) ===== */
+
+.app-bg {
+  position: relative;
+}
+
+.app-bg::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("/bg-ai-robots.png");
+  background-repeat: no-repeat;
+  background-position: center right;
+  background-size: cover;
+  filter: brightness(0.55);
+  z-index: -2;
+}
+
+.app-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(7, 10, 20, 0.92) 0%,
+    rgba(7, 10, 20, 0.75) 45%,
+    rgba(7, 10, 20, 0.30) 70%,
+    rgba(7, 10, 20, 0.10) 100%
+  );
+  z-index: -1;
+}
+
+
+/* ===== Study Time Background ===== */
+
+.study-time-bg {
+  position: relative;
+  min-height: 100vh;
+}
+
+.study-time-bg::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+
+  background-image: url("/time.jpg");
+  background-repeat: no-repeat;
+  background-position: center right;
+  background-size: cover;
+
+  /* Blur + dim for readability */
+  filter: blur(6px) brightness(0.55) contrast(1.05);
+  transform: scale(1.05);
+
+  z-index: -2;
+}
+
+.study-time-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+
+  background: linear-gradient(
+    to right,
+    rgba(7, 10, 20, 0.92) 0%,
+    rgba(7, 10, 20, 0.78) 45%,
+    rgba(7, 10, 20, 0.40) 70%,
+    rgba(7, 10, 20, 0.15) 100%
+  );
+
+  /* z-index: -1; */
+}
+
+/* ===== Focus Card (Deep Shadow) ===== */
+
+.focus-card {
+  background: rgba(8, 10, 20, 0.85);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.75),
+    0 10px 30px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.focus-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 40px 100px rgba(0, 0, 0, 0.85),
+    0 15px 40px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+
+/* ===== Dashboard Navigation Button ===== */
+
+.btn-dashboard {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px 18px;
+  border-radius: 14px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+
+  color: white;
+  background: linear-gradient(
+    135deg,
+    rgb(241, 123, 99),
+    rgba(236, 72, 153, 1)
+  );
+
+  box-shadow:
+    0 18px 45px rgba(99, 102, 241, 0.35),
+    0 8px 20px rgba(0, 0, 0, 0.35);
+
+  border: 0;
+  cursor: pointer;
+
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    filter 160ms ease;
+}
+
+.btn-dashboard:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 28px 65px rgba(99, 102, 241, 0.45),
+    0 12px 30px rgba(0, 0, 0, 0.45);
+  filter: brightness(1.05);
+}
+
+.btn-dashboard:active {
+  transform: translateY(0);
+}
+
+

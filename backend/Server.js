@@ -3,6 +3,11 @@ import cors from 'cors';
 import authRoutes from './src/routes/auth.routes.js';
 import { dbConnect } from "./src/db.js";
 import cookieParser from "cookie-parser";
+import meRoutes from "./src/routes/me.routes.js";
+import profileRoutes from "./src/routes/profile.routes.js";
+
+
+
 // import adminLoginRouter from './routes/adminLoginRouter.js';
 // import memeberShareRouter from './routes/memeberShareRouter.js';
 // import memberTransactionsRouter from './routes/memberTransactionsRouter.js';
@@ -30,6 +35,7 @@ app.use(cors(corsOptions));
 
 app.use(cookieParser());
 
+
 // Apply CORS to preflight (OPTIONS) requests as well
 // app.options('*', cors(corsOptions));
 
@@ -45,6 +51,8 @@ app.use(express.urlencoded({ extended: false }));
 
 // Route handling
 app.use("/api/auth", authRoutes);
+app.use("/api", meRoutes);
+app.use("/api", profileRoutes);
 // app.use("/member", memberRoutes);
 // app.use("/admin/login", adminLoginRouter);
 // app.use("/member/shares", memeberShareRouter);
