@@ -167,4 +167,41 @@ body {
   transform: translateY(0);
 }
 
+/* ===== Aptitude Test Background ===== */
 
+.apti-bg {
+  position: relative;
+  min-height: 100vh;
+}
+
+.apti-bg::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+
+  background-image: url("/apti.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+
+  /* blur + dim so questions stay readable */
+  filter: blur(6px) brightness(0.45) contrast(1.05);
+  transform: scale(1.06);
+
+  z-index: -2;
+}
+
+.apti-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+
+  /* dark overlay for focus */
+  background: linear-gradient(
+    to bottom,
+    rgba(6, 8, 18, 0.88),
+    rgba(6, 8, 18, 0.82)
+  );
+
+  z-index: -1;
+}

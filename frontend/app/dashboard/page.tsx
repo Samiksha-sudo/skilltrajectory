@@ -27,6 +27,26 @@ function formatDate(iso: string) {
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [me, setMe] = useState<MeOk | MeErr | null>(null);
+  const [summary, setSummary] = useState<any>(null);
+  const attempted = summary?.attemptsCount ?? 0;
+  const best = summary?.bestScorePct != null ? `${summary.bestScorePct}%` : "—";
+  const readiness = summary?.readiness?.level ?? "—";
+  const latestScore =
+  summary?.recentActivity?.[0]?.scorePct != null
+    ? `${summary.recentActivity[0].scorePct}%`
+    : null;
+
+
+
+  useEffect(() => {
+    (async () => {
+      const res = await fetch("/api/dashboard/summary", { cache: "no-store" });
+      if (!res.ok) return;
+      const data = await res.json();
+      setSummary(data);
+    })();
+  }, []);
+
 
   useEffect(() => {
     (async () => {
@@ -50,13 +70,40 @@ export default function DashboardPage() {
   const user = !loading && me && "user" in me ? me.user : null;
 
   // Placeholder metrics for now (S04+ will replace with real data)
-  const kpis = useMemo(() => {
-    return [
-      { label: "Tests Attempted", value: "0", sub: "Start your first test" },
-      { label: "Best Score", value: "—", sub: "No attempts yet" },
-      { label: "Readiness", value: "—", sub: "Generated after scoring" },
-    ];
-  }, []);
+const kpis = useMemo(() => {
+  const attempts = summary?.attemptsCount ?? 0;
+const bestScoreValue =
+  summary?.bestScorePct != null ? `${summary.bestScorePct}%` : "—";
+
+
+  return [
+    {
+      label: "Tests Attempted",
+      value: String(attempts),
+      sub: attempts === 0 ? "Start your first test" : "Completed assessments",
+    },
+{
+      label: "Best Score",
+      value: bestScoreValue,
+      sub:
+        bestScoreValue !== "—"
+          ? "Highest score achieved"
+          : "No scored attempts yet",
+    },
+    {
+      label: "Readiness",
+      value: readiness,
+      sub: summary?.readiness ? "Based on latest attempt" : "Generated after scoring",
+    },
+    {
+      label: "Latest Score",
+      value: latestScore,
+      sub: latestScore !== "—" ? "From most recent aptitude test" : "No scored attempt yet",
+    },
+  ];
+}, [summary, latestScore]);
+
+
 
   return (
     <div className={styles.page}>
@@ -140,7 +187,25 @@ export default function DashboardPage() {
 
               <div className={styles.list}>
                 <div className={styles.item}>
-                  <p className={styles.itemTitle}>No tests attempted yet</p>
+                {summary?.recentActivity?.length ? (
+                  summary.recentActivity.map((a: any) => (
+                    <div key={a.attemptId} className="glass" style={{ padding: 12, marginTop: 10 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <span>Attempt #{a.attemptId}</span>
+                        <strong>
+                          {a.scorePct != null ? `${a.scorePct}%` : a.status}
+                        </strong>
+                      </div>
+                      <div style={{ fontSize: 12, opacity: 0.65 }}>
+                        {new Date(a.startedAt).toLocaleString()}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p>No tests attempted yet</p>
+                )}
+
+
                   <p className={styles.itemMeta}>
                     Start your first aptitude test to generate scoring, readiness level, and skill gaps.
                   </p>
