@@ -5,7 +5,9 @@ import { dbConnect } from "./src/db.js";
 import cookieParser from "cookie-parser";
 import meRoutes from "./src/routes/me.routes.js";
 import profileRoutes from "./src/routes/profile.routes.js";
-
+import testRoutes from "./src/routes/test.routes.js";
+import attemptRoutes from "./src/routes/attempt.routes.js";
+import dashboardRoutes from "./src/routes/dashboard.routes.js";
 
 
 // import adminLoginRouter from './routes/adminLoginRouter.js';
@@ -53,12 +55,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/api/auth", authRoutes);
 app.use("/api", meRoutes);
 app.use("/api", profileRoutes);
-// app.use("/member", memberRoutes);
-// app.use("/admin/login", adminLoginRouter);
-// app.use("/member/shares", memeberShareRouter);
-// app.use("/member/loan", memberTransactionsRouter);
-// app.use("/member/requestLoan", requestLoan);
-// app.use("/member/memberdetails", memberdetails);
+app.use("/api", testRoutes);
+app.use("/api", attemptRoutes);
+app.use("/api", dashboardRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
