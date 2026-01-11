@@ -14,6 +14,7 @@ import planRoutes from "./src/routes/plan.routes.js";
 import timeEstimateRoutes from "./src/routes/timeEstimate.routes.js";
 import milestonesRoutes from "./src/routes/milestones.routes.js";
 import progressRoutes from "./src/routes/progress.routes.js";
+import adminRoutes from "./src/routes/admin.routes.js";
 
 
 
@@ -67,7 +68,7 @@ app.use("/api", planRoutes);
 app.use("/api", timeEstimateRoutes);
 app.use("/api", milestonesRoutes);
 app.use("/api", progressRoutes);
-
+app.use("/api", adminRoutes);
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);

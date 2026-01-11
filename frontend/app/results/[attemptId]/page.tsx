@@ -9,6 +9,8 @@ export default function ResultsPage() {
   const params = useParams();
   const attemptId = params.attemptId as string;
 
+  
+
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [gaps, setGaps] = useState<any>(null);
@@ -176,6 +178,8 @@ async function handleReattempt() {
                             </tr>
                         </tbody>
                         </table>
+
+
                     </div>
                     )}
 
