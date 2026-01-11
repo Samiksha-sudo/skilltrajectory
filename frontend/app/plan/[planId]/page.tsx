@@ -22,6 +22,8 @@ export default function PlanPage() {
   const [estimate, setEstimate] = useState<any>(null);
   const [milestones, setMilestones] = useState<any[]>([]);
   const [openWeek, setOpenWeek] = useState<number | null>(1);
+  const [progress, setProgress] = useState<any[]>([]);
+
 
   // -------- Fetch plan + estimate (keep as you have, but safer parsing) --------
   useEffect(() => {
@@ -67,6 +69,44 @@ export default function PlanPage() {
     })();
   }, [planId]);
 
+  useEffect(() => {
+  (async () => {
+    const res = await fetch(`/api/progress/${planId}`, { cache: "no-store" });
+    const json = await res.json();
+    setProgress(json.progress || []);
+  })();
+}, [planId]);
+
+   function isDone(weekNo: number, topic: string) {
+  return progress.some(
+    (p) => p.week_no === weekNo && p.topic_tag === topic && p.status === "DONE"
+  );
+}
+
+async function toggleDone(weekNo: number, topic: string, checked: boolean) {
+  await fetch("/api/progress/update", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      planId: Number(planId),
+      weekNo,
+      topicTag: topic,
+      status: checked ? "DONE" : "TODO",
+    }),
+  });
+
+  // reload progress
+  const res = await fetch(`/api/progress/${planId}`, { cache: "no-store" });
+  const json = await res.json();
+  setProgress(json.progress || []);
+}
+
+
+
+
+
+
+
   // -------- Derived KPIs --------
   const kpis = useMemo(() => {
     const weeksCount = milestones?.length || data?.weeks?.length || 0;
@@ -93,11 +133,22 @@ export default function PlanPage() {
   }, [data, milestones, estimate]);
 
   // Visual progress fill (purely illustrative)
-  const progressPct = useMemo(() => {
-    const weeksCount = milestones?.length || 0;
-    if (!weeksCount || !openWeek) return 0;
-    return Math.round((openWeek / weeksCount) * 100);
-  }, [milestones, openWeek]);
+const progressPct = useMemo(() => {
+  // 1️⃣ Real completion-based progress (preferred)
+  const totalTopics = milestones.flatMap((m) => m.tasks || []).length;
+
+  if (totalTopics > 0) {
+    const doneTopics = progress.filter((p) => p.status === "DONE").length;
+    return Math.round((doneTopics / totalTopics) * 100);
+  }
+
+  // 2️⃣ Fallback: week navigation progress (UI-only)
+  const weeksCount = milestones?.length || 0;
+  if (!weeksCount || !openWeek) return 0;
+
+  return Math.round((openWeek / weeksCount) * 100);
+}, [milestones, progress, openWeek]);
+
 
   return (
     <div className="ai-bg">
@@ -112,6 +163,8 @@ export default function PlanPage() {
                   A gap-driven roadmap with weekly milestones and a time-to-readiness estimate.
                 </p>
               </div>
+
+
 
               <div className={styles.pills}>
                 <span className={`${styles.pill} ${styles.pillBlue}`}>
@@ -141,6 +194,10 @@ export default function PlanPage() {
               {/* Progress indicator (visual) */}
               <div className={styles.progressBar}>
                 <div className={styles.progressFill} style={{ width: `${progressPct}%` }} />
+                <div style={{ fontSize: 12, opacity: 0.7 }}>
+                {progress.length > 0 ? "Based on completed topics" : "Based on weekly plan"}
+                </div>
+
               </div>
 
               <div className={styles.milestonesWrap}>
@@ -185,19 +242,58 @@ export default function PlanPage() {
 
                         {isOpen && (
                           <div className={styles.details}>
-                            {(m.tasks || []).map((t: any, idx: number) => (
-                              <div key={idx} className={styles.taskCard}>
-                                <div className={styles.taskHeader}>
-                                  <span className={styles.topic}>{t.topic_tag}</span>
-                                  <span className={styles.mins}>{t.minutes} min</span>
-                                </div>
-                                <ul className={styles.taskList}>
-                                  {(t.tasks || []).map((x: string, i: number) => (
-                                    <li key={i}>{x}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            ))}
+                           {(m.tasks || []).map((t: any, idx: number) => {
+  const done = isDone(m.week_no, t.topic_tag);
+
+  return (
+    <div
+      key={idx}
+      className={`glass ${done ? styles.taskCardDone : ""}`}
+      style={{ padding: 12 }}
+    >
+      <div className={styles.taskRow}>
+        <input
+          type="checkbox"
+          className={styles.checkbox}
+          checked={done}
+          onChange={(e) =>
+            toggleDone(m.week_no, t.topic_tag, e.target.checked)
+          }
+        />
+
+        <div>
+          <div
+            className={`${styles.taskText} ${
+              done ? styles.taskTextDone : ""
+            }`}
+          >
+            {t.topic_tag}
+          </div>
+
+          <div style={{ fontSize: 12, opacity: 0.75 }}>
+            {t.minutes} min
+          </div>
+        </div>
+      </div>
+
+      {t.tasks?.length > 0 && (
+        <ul
+          className={done ? styles.taskTextDone : ""}
+          style={{
+            marginTop: 8,
+            paddingLeft: 22,
+            fontSize: 13,
+            opacity: done ? 0.6 : 0.9,
+          }}
+        >
+          {t.tasks.map((x: string, i: number) => (
+            <li key={i}>{x}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+})}
 
                             {!m.tasks?.length && (
                               <div style={{ opacity: 0.75 }}>

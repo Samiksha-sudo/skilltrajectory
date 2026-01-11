@@ -13,6 +13,7 @@ import gapsRoutes from "./src/routes/gaps.routes.js";
 import planRoutes from "./src/routes/plan.routes.js";
 import timeEstimateRoutes from "./src/routes/timeEstimate.routes.js";
 import milestonesRoutes from "./src/routes/milestones.routes.js";
+import progressRoutes from "./src/routes/progress.routes.js";
 
 
 
@@ -65,6 +66,7 @@ app.use("/api", gapsRoutes);
 app.use("/api", planRoutes);
 app.use("/api", timeEstimateRoutes);
 app.use("/api", milestonesRoutes);
+app.use("/api", progressRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

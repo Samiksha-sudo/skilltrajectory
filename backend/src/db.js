@@ -183,3 +183,51 @@ StudyPlanWeek.belongsTo(StudyPlan, {
 });
 
 
+
+export const StudyProgress = sequelize.define(
+  "StudyProgress",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    plan_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    week_no: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    topic_tag: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    status: {
+      type: DataTypes.ENUM("TODO", "DONE"),
+      defaultValue: "TODO",
+    },
+    completed_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+  },
+  {
+    tableName: "study_progress",
+    timestamps: false,
+    indexes: [
+      {
+        unique: true,
+        fields: ["user_id", "plan_id", "week_no", "topic_tag"],
+      },
+    ],
+  }
+);
+
+
+

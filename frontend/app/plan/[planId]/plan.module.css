@@ -338,3 +338,46 @@
   background: rgba(239,68,68,0.10);
   color: rgba(255,255,255,0.92);
 }
+
+.taskRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.taskRowDone {
+  opacity: 0.55;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #22c55e;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.checkbox:checked {
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.25);
+}
+
+.checkbox:active {
+  transform: scale(0.9);
+}
+
+
+.taskText {
+  font-weight: 600;
+  transition: color 200ms ease, text-decoration 200ms ease;
+}
+
+.taskTextDone {
+  text-decoration: line-through;
+  color: rgba(255,255,255,0.65);
+}
+
+.taskCardDone {
+  background: rgba(34,197,94,0.08);
+  border-color: rgba(34,197,94,0.25);
+}
