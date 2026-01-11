@@ -230,4 +230,28 @@ export const StudyProgress = sequelize.define(
 );
 
 
+export const SkillGap = sequelize.define(
+  "SkillGap",
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+
+    attempt_id: { type: DataTypes.INTEGER, allowNull: false },
+    user_id: { type: DataTypes.INTEGER, allowNull: false },
+
+    topic_tag: { type: DataTypes.STRING(100), allowNull: false },
+    section: { type: DataTypes.STRING(50), allowNull: false },
+
+    total_questions: { type: DataTypes.INTEGER, allowNull: false },
+    correct_answers: { type: DataTypes.INTEGER, allowNull: false },
+
+    accuracy_pct: { type: DataTypes.DECIMAL(5,2), allowNull: false },
+    gap_score: { type: DataTypes.DECIMAL(5,2), allowNull: false },
+
+    created_at: { type: DataTypes.DATE },
+  },
+  {
+    tableName: "skill_gaps",
+    timestamps: false,
+  }
+);
 

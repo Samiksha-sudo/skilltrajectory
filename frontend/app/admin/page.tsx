@@ -79,9 +79,10 @@ export default function AdminDashboardPage() {
                     Manage Questions <span style={{ opacity: 0.85 }}>→</span>
                   </Link>
 
-                  <Link href="/admin/analytics" className={styles.btnGhost}>
+                    <Link href="/admin/analytics" className={styles.btnGhost}>
                     View Analytics
-                  </Link>
+                    </Link>
+
 
                   <Link href="/dashboard" className={styles.btnGhost}>
                     Back to User Dashboard

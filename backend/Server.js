@@ -15,6 +15,10 @@ import timeEstimateRoutes from "./src/routes/timeEstimate.routes.js";
 import milestonesRoutes from "./src/routes/milestones.routes.js";
 import progressRoutes from "./src/routes/progress.routes.js";
 import adminRoutes from "./src/routes/admin.routes.js";
+import adminQuestionRoutes from "./src/routes/admin.questions.routes.js";
+import adminAnalyticsRoutes from "./src/routes/admin.analytics.routes.js";
+
+
 
 
 
@@ -69,6 +73,10 @@ app.use("/api", timeEstimateRoutes);
 app.use("/api", milestonesRoutes);
 app.use("/api", progressRoutes);
 app.use("/api", adminRoutes);
+app.use("/api", adminQuestionRoutes);
+app.use("/api", adminAnalyticsRoutes);
+
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
