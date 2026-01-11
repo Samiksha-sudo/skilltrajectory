@@ -26,34 +26,6 @@ export async function startAttempt(req, res) {
   }
 }
 
-export async function getAttemptQuestions(req, res) {
-  try {
-    const userId = req.user?.sub;
-    if (!userId) return res.status(401).json({ message: "Unauthenticated" });
-
-    const attemptId = Number(req.params.id);
-    if (!Number.isInteger(attemptId)) return res.status(400).json({ message: "Invalid attemptId" });
-
-    const attempt = await Attempt.findByPk(attemptId);
-    if (!attempt || attempt.user_id !== userId) {
-      return res.status(404).json({ message: "Attempt not found" });
-    }
-
-    // For S05: load demo questions for a section (APTITUDE)
-    const questions = await Question.findAll({
-      where: { is_active: true, section: "APTITUDE" },
-      order: [["id", "ASC"]],
-      attributes: ["id", "section", "topic_tag", "difficulty", "question_text", "options_json"],
-      limit: 10,
-    });
-
-    return res.status(200).json({ attemptId, questions });
-  } catch (err) {
-    console.error("getAttemptQuestions error:", err);
-    return res.status(500).json({ message: "Server error" });
-  }
-}
-
 export async function submitAttempt(req, res) {
   try {
     const userId = req.user?.sub;
@@ -129,8 +101,6 @@ export async function submitAttempt(req, res) {
   }
 }
 
-
-
 export async function saveAnswer(req, res) {
   try {
     const userId = req.user?.sub;
@@ -172,3 +142,39 @@ export async function saveAnswer(req, res) {
   }
 }
 
+export async function getAttemptQuestions(req, res) {
+  try {
+    const userId = req.user?.sub;
+    if (!userId) return res.status(401).json({ message: "Unauthenticated" });
+
+    const attemptId = Number(req.params.id);
+    const section = req.query.section;
+
+    if (!Number.isInteger(attemptId)) {
+      return res.status(400).json({ message: "Invalid attemptId" });
+    }
+
+    const attempt = await Attempt.findByPk(attemptId);
+    if (!attempt || attempt.user_id !== userId) {
+      return res.status(404).json({ message: "Attempt not found" });
+    }
+
+    const where = { is_active: 1 };
+    if (section) where.section = section;
+
+    const questions = await Question.findAll({
+      where,
+      attributes: ["id", "section", "question_text", "options_json"],
+      order: [["id", "ASC"]],
+    });
+
+    return res.status(200).json({
+      attemptId,
+      section,
+      questions,
+    });
+  } catch (err) {
+    console.error("getAttemptQuestions error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+}

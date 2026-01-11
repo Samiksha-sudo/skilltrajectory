@@ -7,14 +7,7 @@ export async function GET(req: Request, ctx: { params: any }) {
   const rawParams = typeof ctx.params?.then === "function" ? await ctx.params : ctx.params;
   const id = rawParams?.id;
 
-  const { searchParams } = new URL(req.url);
-  const section = searchParams.get("section");
-
-  const url =
-    `${BACKEND}/api/attempts/${id}/questions` +
-    (section ? `?section=${section}` : "");
-
-  const res = await fetch(url, {
+  const res = await fetch(`${BACKEND}/api/attempts/${id}/readiness`, {
     headers: { cookie, Accept: "application/json" },
     cache: "no-store",
   });
