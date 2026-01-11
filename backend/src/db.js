@@ -99,3 +99,87 @@ export const AttemptAnswer = sequelize.define("AttemptAnswer", {
   is_correct: { type: DataTypes.BOOLEAN, allowNull: true },
   time_spent_sec: { type: DataTypes.INTEGER, allowNull: true },
 }, { tableName: "attempt_answers", timestamps: false });
+
+export const StudyPlan = sequelize.define(
+  "StudyPlan",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    attempt_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    plan_version: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+    focus_summary: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+  },
+  {
+    tableName: "study_plans",
+    timestamps: false,
+  }
+);
+
+export const StudyPlanWeek = sequelize.define(
+  "StudyPlanWeek",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    plan_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    week_no: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    objective: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    tasks_json: {
+      type: DataTypes.JSON,
+      allowNull: true,
+    },
+    estimated_minutes: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+  },
+  {
+    tableName: "study_plan_weeks",
+    timestamps: false,
+  }
+);
+
+StudyPlan.hasMany(StudyPlanWeek, {
+  foreignKey: "plan_id",
+  as: "weeks",
+});
+
+StudyPlanWeek.belongsTo(StudyPlan, {
+  foreignKey: "plan_id",
+  as: "plan",
+});
+
+

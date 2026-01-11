@@ -9,14 +9,10 @@ import testRoutes from "./src/routes/test.routes.js";
 import attemptRoutes from "./src/routes/attempt.routes.js";
 import dashboardRoutes from "./src/routes/dashboard.routes.js";
 import readinessRoutes from "./src/routes/readiness.routes.js";
+import gapsRoutes from "./src/routes/gaps.routes.js";
+import planRoutes from "./src/routes/plan.routes.js";
 
 
-
-// import adminLoginRouter from './routes/adminLoginRouter.js';
-// import memeberShareRouter from './routes/memeberShareRouter.js';
-// import memberTransactionsRouter from './routes/memberTransactionsRouter.js';
-// import requestLoan from './routes/requestLoan.js';
-// import memberdetails from './routes/memberDetailsRoutes.js';
 
 const PORT = process.env.PORT;
 
@@ -61,7 +57,8 @@ app.use("/api", testRoutes);
 app.use("/api", attemptRoutes);
 app.use("/api", dashboardRoutes);
 app.use("/api", readinessRoutes);
-
+app.use("/api", gapsRoutes);
+app.use("/api", planRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

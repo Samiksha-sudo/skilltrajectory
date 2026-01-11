@@ -10,6 +10,10 @@ export default function ResultsPage() {
 
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [gaps, setGaps] = useState<any>(null);
+  const weakTopics = gaps?.weakTopics ?? [];
+
+
 
   const cellKey = {
   padding: "10px",
@@ -40,6 +44,20 @@ const cellVal = {
       }
     })();
   }, [attemptId]);
+
+  useEffect(() => {
+  (async () => {
+    try {
+      const res = await fetch(`/api/attempts/${attemptId}/gaps`, { cache: "no-store" });
+      const text = await res.text();
+      const json = text ? JSON.parse(text) : {};
+      if (res.ok) setGaps(json);
+    } catch {
+      // ignore
+    }
+  })();
+}, [attemptId]);
+
 
   return (
     <div className="ai-bg">
@@ -76,47 +94,129 @@ const cellVal = {
 
               <div className="glass" style={{ padding: 16, marginTop: 12 }}>
                 <h3 style={{ marginTop: 0, color: "white" }}>Explanation</h3>
-{data?.explanation && (
-  <div className="glass" style={{ padding: 16, marginTop: 14 }}>
-    <h3 style={{ marginTop: 0, color: "white" }}>Readiness Explanation</h3>
+                    {data?.explanation && (
+                    <div className="glass" style={{ padding: 16, marginTop: 14 }}>
+                        <h3 style={{ marginTop: 0, color: "white" }}>Readiness Explanation</h3>
 
-    <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 10 }}>
-      <tbody>
-        <tr>
-          <td style={cellKey}>Score Percentage</td>
-          <td style={cellVal}>
-            {data.explanation.score_pct != null
-              ? `${data.explanation.score_pct}%`
-              : "N/A"}
-          </td>
-        </tr>
+                        <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 10 }}>
+                        <tbody>
+                            <tr>
+                            <td style={cellKey}>Score Percentage</td>
+                            <td style={cellVal}>
+                                {data.explanation.score_pct != null
+                                ? `${data.explanation.score_pct}%`
+                                : "N/A"}
+                            </td>
+                            </tr>
 
-        <tr>
-          <td style={cellKey}>Readiness Rule Applied</td>
-          <td style={cellVal}>{data.explanation.rule_applied}</td>
-        </tr>
+                            <tr>
+                            <td style={cellKey}>Readiness Rule Applied</td>
+                            <td style={cellVal}>{data.explanation.rule_applied}</td>
+                            </tr>
 
-        <tr>
-          <td style={cellKey}>Thresholds</td>
-          <td style={cellVal}>
-            Beginner: {data.explanation.thresholds?.beginner} <br />
-            Intermediate: {data.explanation.thresholds?.intermediate} <br />
-            Interview-Ready: {data.explanation.thresholds?.interview_ready}
-          </td>
-        </tr>
+                            <tr>
+                            <td style={cellKey}>Thresholds</td>
+                            <td style={cellVal}>
+                                Beginner: {data.explanation.thresholds?.beginner} <br />
+                                Intermediate: {data.explanation.thresholds?.intermediate} <br />
+                                Interview-Ready: {data.explanation.thresholds?.interview_ready}
+                            </td>
+                            </tr>
 
-        <tr>
-          <td style={cellKey}>Explanation</td>
-          <td style={cellVal}>{data.explanation.notes}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-)}
+                            <tr>
+                            <td style={cellKey}>Explanation</td>
+                            <td style={cellVal}>{data.explanation.notes}</td>
+                            </tr>
+                        </tbody>
+                        </table>
+                    </div>
+                    )}
 
               </div>
             </>
           )}
+
+          {gaps && (
+  <div style={{ marginTop: 14, display: "grid", gap: 12 }}>
+    {/* Weak Topics */}
+    <div className="glass" style={{ padding: 16 }}>
+      <h3 style={{ marginTop: 0, color: "white" }}>Weak Areas</h3>
+
+      {gaps.weakTopics?.length ? (
+        <div style={{ display: "grid", gap: 10 }}>
+          {gaps.weakTopics.map((t: any) => (
+            <div key={t.topic_tag} className="glass" style={{ padding: 12 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
+                <strong style={{ color: "white" }}>{t.topic_tag}</strong>
+                <span style={{ color: "#ef4444", fontWeight: 700 }}>
+                  {t.accuracy_pct}%
+                </span>
+              </div>
+              <div style={{ fontSize: 12, opacity: 0.75, color: "rgba(255,255,255,0.75)" }}>
+                Correct: {t.correct}/{t.total} • Sections: {t.sections?.join(", ") || "—"}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p style={{ color: "rgba(255,255,255,0.7)" }}>
+          No weak areas detected (below {gaps.thresholds?.weak_below ?? 60}%).
+        </p>
+      )}
+    </div>
+
+    {/* Strengths */}
+    <div className="glass" style={{ padding: 16 }}>
+      <h3 style={{ marginTop: 0, color: "white" }}>Strengths</h3>
+
+            {gaps.strengths?.length ? (
+                <div style={{ display: "grid", gap: 10 }}>
+                {gaps.strengths.map((t: any) => (
+                    <div key={t.topic_tag} className="glass" style={{ padding: 12 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
+                        <strong style={{ color: "white" }}>{t.topic_tag}</strong>
+                        <span style={{ color: "#22c55e", fontWeight: 700 }}>
+                        {t.accuracy_pct}%
+                        </span>
+                    </div>
+                    <div style={{ fontSize: 12, opacity: 0.75, color: "rgba(255,255,255,0.75)" }}>
+                        Correct: {t.correct}/{t.total} • Sections: {t.sections?.join(", ") || "—"}
+                    </div>
+                    </div>
+                ))}
+                </div>
+            ) : (
+                <p style={{ color: "rgba(255,255,255,0.7)" }}>
+                Strengths will appear after you score at least {gaps.thresholds?.strength_from ?? 80}% in a topic.
+                </p>
+            )}
+            </div>
+        </div>
+        )}
+
+        <button
+            className="btn-dashboard"
+            disabled={!weakTopics.length}
+            onClick={async () => {
+                const res = await fetch("/api/plans/generate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    attemptId: Number(attemptId),
+                    weakTopics,
+                    focusSummary: "Auto-generated from skill gaps",
+                }),
+                cache: "no-store",
+                });
+
+                const data = await res.json();
+                if (res.ok) window.location.href = `/plan/${data.planId}`;
+            }}
+            >
+            Generate Study Plan
+            </button>
+
+
 
           <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
             <Link href="/dashboard" className="btn-dashboard">Back to Dashboard</Link>
