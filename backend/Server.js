@@ -8,6 +8,8 @@ import profileRoutes from "./src/routes/profile.routes.js";
 import testRoutes from "./src/routes/test.routes.js";
 import attemptRoutes from "./src/routes/attempt.routes.js";
 import dashboardRoutes from "./src/routes/dashboard.routes.js";
+import readinessRoutes from "./src/routes/readiness.routes.js";
+
 
 
 // import adminLoginRouter from './routes/adminLoginRouter.js';
@@ -58,6 +60,8 @@ app.use("/api", profileRoutes);
 app.use("/api", testRoutes);
 app.use("/api", attemptRoutes);
 app.use("/api", dashboardRoutes);
+app.use("/api", readinessRoutes);
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {

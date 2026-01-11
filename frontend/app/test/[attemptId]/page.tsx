@@ -13,12 +13,15 @@ export default function AttemptPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Timer: 10 minutes (S05 scope)
-  const totalSeconds = 10 * 60;
+  const totalSeconds = 1 * 60;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
 
   const elapsedSec = totalSeconds - secondsLeft;
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [savingQ, setSavingQ] = useState<number | null>(null);
+
 
   const SECTIONS = [
     { key: "APTITUDE", label: "Aptitude" },
@@ -36,6 +39,31 @@ export default function AttemptPage() {
     const s = secondsLeft % 60;
     return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
   }, [secondsLeft]);
+
+  async function saveAnswer(questionId: number, selectedOption: string) {
+  // update UI immediately (optimistic)
+  setAnswers((prev) => ({ ...prev, [questionId]: selectedOption }));
+  setSavingQ(questionId);
+
+  try {
+    const res = await fetch(`/api/attempts/${attemptId}/answer`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ questionId, selectedOption }),
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("Save answer failed:", res.status, text);
+    }
+  } catch (e) {
+    console.error("Save answer error:", e);
+  } finally {
+    setSavingQ(null);
+  }
+}
+
 
   async function submitTest(reason: "manual" | "auto") {
     if (submitting || submitted) return;
@@ -62,8 +90,8 @@ export default function AttemptPage() {
 
       setSubmitted(true);
 
-      // Simple next step: go back dashboard (later: /results/[attemptId])
-      window.location.href = "/dashboard";
+      
+       window.location.href = `/results/${attemptId}`;
     } catch (e: any) {
       setError(`Submit error: ${String(e?.message || e)}`);
     } finally {
@@ -197,31 +225,44 @@ export default function AttemptPage() {
         {SECTIONS.find((s) => s.key === activeSection)?.label}
       </h2>
 
-{loading ? (
-  <p>Loading questions…</p>
-) : questions.length === 0 ? (
-  <p>No questions in this section.</p>
-) : (
-  questions.map((q, idx) => {
-    const opts = Array.isArray(q.options_json)
-      ? q.options_json
-      : JSON.parse(q.options_json || "[]");
+        {loadingQs ? (
+          <p>Loading questions…</p>
+        ) : questions.length === 0 ? (
+          <p>No questions in this section.</p>
+        ) : (
+          questions.map((q, idx) => {
+            const opts = Array.isArray(q.options_json)
+              ? q.options_json
+              : JSON.parse(q.options_json || "[]");
 
-    return (
-      <div key={q.id} className="glass" style={{ padding: 16, marginBottom: 12 }}>
-        <p>
-          <strong>Q{idx + 1}.</strong> {q.question_text}
-        </p>
+            return (
+              <div key={q.id} className="glass" style={{ padding: 16, marginBottom: 12 }}>
+                <p>
+                  <strong>Q{idx + 1}.</strong> {q.question_text}
+                </p>
 
-        {opts.map((opt: string, i: number) => (
-          <label key={i} style={{ display: "block", marginTop: 6 }}>
-            <input type="radio" name={`q_${q.id}`} /> {opt}
-          </label>
-        ))}
-      </div>
-    );
-  })
-)}
+                {opts.map((opt: string, i: number) => (
+                  <label key={i} className="glass" style={{ padding: 10, borderRadius: 14 }}>
+                    <input
+                      type="radio"
+                      name={`q_${q.id}`}
+                      checked={answers[q.id] === opt}
+                      onChange={() => saveAnswer(q.id, opt)}
+                      style={{ marginRight: 10 }}
+                    />
+                    <span style={{ color: "rgba(255,255,255,0.9)" }}>{opt}</span>
+                    {savingQ === q.id && (
+                      <span style={{ marginLeft: 10, fontSize: 12, opacity: 0.7 }}>
+                        Saving...
+                      </span>
+                    )}
+                  </label>
+                ))}
+
+              </div>
+            );
+          })
+        )}
 
           <button
             className="btn-dashboard"
