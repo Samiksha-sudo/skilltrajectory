@@ -11,6 +11,10 @@ import dashboardRoutes from "./src/routes/dashboard.routes.js";
 import readinessRoutes from "./src/routes/readiness.routes.js";
 import gapsRoutes from "./src/routes/gaps.routes.js";
 import planRoutes from "./src/routes/plan.routes.js";
+import timeEstimateRoutes from "./src/routes/timeEstimate.routes.js";
+import milestonesRoutes from "./src/routes/milestones.routes.js";
+
+
 
 
 
@@ -59,6 +63,8 @@ app.use("/api", dashboardRoutes);
 app.use("/api", readinessRoutes);
 app.use("/api", gapsRoutes);
 app.use("/api", planRoutes);
+app.use("/api", timeEstimateRoutes);
+app.use("/api", milestonesRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
