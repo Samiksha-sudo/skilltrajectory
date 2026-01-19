@@ -20,10 +20,6 @@ import adminAnalyticsRoutes from "./src/routes/admin.analytics.routes.js";
 
 
 
-
-
-
-
 const PORT = process.env.PORT;
 
 const app = express();
@@ -75,7 +71,6 @@ app.use("/api", progressRoutes);
 app.use("/api", adminRoutes);
 app.use("/api", adminQuestionRoutes);
 app.use("/api", adminAnalyticsRoutes);
-
 
 // Error handling middleware
 app.use((err, req, res, next) => {

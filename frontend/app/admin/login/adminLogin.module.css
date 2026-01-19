@@ -6,7 +6,7 @@
   padding: 28px;
   background:
     linear-gradient(rgba(8, 10, 18, 0.78), rgba(8, 10, 18, 0.78)),
-    url("/admin.jpeg") center / cover no-repeat fixed;
+    url("/admin.jpg") center / cover no-repeat fixed;
 }
 
 .shell {

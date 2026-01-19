@@ -7,16 +7,52 @@ import styles from "./admin.module.css";
 export default function AdminDashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState(false);
+  const [summary, setSummary] = useState<any>(null);
+
+    useEffect(() => {
+    (async () => {
+        const res = await fetch("/api/admin/summary", { cache: "no-store" });
+        console.log("response for summary",JSON.stringify(res))
+        if (!res.ok) return;
+        const json = await res.json();
+        setSummary(json);
+    })();
+    }, []);
+
+    async function handleAdminLogout() {
+      await fetch("/api/admin/logout", { method: "POST" });
+      window.location.href = "/admin/login";
+    }
+
 
   // Optional: later you can populate real stats from an admin summary endpoint
-  const kpis = useMemo(() => {
-    return [
-      { label: "Questions", value: "—", hint: "Question bank size" },
-      { label: "Attempts", value: "—", hint: "Total submitted attempts" },
-      { label: "Active Test", value: "—", hint: "Current test configuration" },
-      { label: "Users", value: "—", hint: "Registered accounts" },
-    ];
-  }, []);
+const kpis = useMemo(() => {
+  return [
+    {
+      label: "Questions",
+      value: summary?.questionsCount ?? "—",
+      hint: "Question bank size",
+    },
+    {
+      label: "Attempts",
+      value: summary?.attemptsCount ?? "—",
+      hint: "Total submitted attempts",
+    },
+    {
+      label: "Active Test",
+      value: summary?.activeTest
+        ? summary.activeTest.name
+        : "None",
+      hint: "Current test configuration",
+    },
+    {
+      label: "Users",
+      value: summary?.usersCount ?? "—",
+      hint: "Registered accounts",
+    },
+  ];
+}, [summary]);
+
 
   useEffect(() => {
     (async () => {
@@ -36,6 +72,15 @@ export default function AdminDashboardPage() {
         window.location.href = "/admin/login";
       }
     })();
+
+    (async () => {
+        const res = await fetch("/api/admin/summary", { cache: "no-store" });
+        console.log("response for summary",JSON.stringify(res))
+        if (!res.ok) return;
+        const json = await res.json();
+        setSummary(json);
+    })();
+    
   }, []);
 
   return (
@@ -82,6 +127,11 @@ export default function AdminDashboardPage() {
                     <Link href="/admin/analytics" className={styles.btnGhost}>
                     View Analytics
                     </Link>
+
+                    {/* <button className={styles.btnDanger} onClick={handleAdminLogout}>
+                      Logout (Admin)
+                    </button> */}
+
 
 
                   <Link href="/dashboard" className={styles.btnGhost}>

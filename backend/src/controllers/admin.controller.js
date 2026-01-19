@@ -9,8 +9,11 @@ export async function adminLogin(req, res) {
       return res.status(400).json({ message: "Email and password required" });
     }
 
-    const user = await User.findOne({ where: { email } });
+    let user = await User.findOne({ where: { email } });
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
+
+    user = user.dataValues
+    console.log("user",user);
 
     // must be ADMIN
     if (user.role !== "ADMIN") {
@@ -25,15 +28,20 @@ export async function adminLogin(req, res) {
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
+   
+    console.log("Setting admin cookie for user:", user.id);
+    console.log("Setting token below", token);
 
     // cookie security options
     res.cookie("st_token", token, {
       httpOnly: true,
       sameSite: "lax",
-      secure: false, // set true in production (https)
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      secure: false, // set true in production with HTTPS
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       path: "/",
     });
+
+     console.log("Setting token above", token);
 
     return res.json({
       message: "Admin login success",

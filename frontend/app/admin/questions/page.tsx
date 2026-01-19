@@ -37,16 +37,35 @@ const DEFAULT_FORM: FormState = {
   is_active: true,
 };
 
-function safeArray(v: any): string[] {
-  if (Array.isArray(v)) return v.map((x) => String(x ?? ""));
-  if (typeof v === "string") {
+function normalizeOptions(v: any): string[] {
+  let arr: string[] = [];
+
+  if (Array.isArray(v)) arr = v.map((x) => String(x ?? ""));
+  else if (typeof v === "string") {
     try {
       const parsed = JSON.parse(v);
-      if (Array.isArray(parsed)) return parsed.map((x) => String(x ?? ""));
-    } catch {}
+      if (Array.isArray(parsed)) arr = parsed.map((x) => String(x ?? ""));
+    } catch {
+      // ignore
+    }
   }
-  return [];
+
+  // Ensure at least 4 rows for UI comfort, but allow more
+  if (arr.length < 4) {
+    arr = [...arr, ...Array(4 - arr.length).fill("")];
+  }
+
+  return arr;
 }
+
+function clampCorrectOption(correct: string, optionsLength: number) {
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  const idx = letters.indexOf(correct || "A");
+  if (idx < 0) return "A";
+  if (idx >= optionsLength) return letters[Math.max(0, optionsLength - 1)];
+  return letters[idx];
+}
+
 
 export default function AdminQuestionsPage() {
   const [items, setItems] = useState<Question[]>([]);
@@ -65,6 +84,10 @@ export default function AdminQuestionsPage() {
   const [form, setForm] = useState<FormState>({ ...DEFAULT_FORM });
   const [saving, setSaving] = useState(false);
   const [modalMsg, setModalMsg] = useState<string | null>(null);
+
+
+
+
 
   const queryString = useMemo(() => {
     const sp = new URLSearchParams();
@@ -103,6 +126,18 @@ export default function AdminQuestionsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryString]);
 
+  useEffect(() => {
+  if (open) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "";
+  }
+  return () => {
+    document.body.style.overflow = "";
+  };
+}, [open]);
+
+
   function openCreate() {
     setMode("create");
     setForm({ ...DEFAULT_FORM });
@@ -110,49 +145,54 @@ export default function AdminQuestionsPage() {
     setOpen(true);
   }
 
-  function openEdit(row: Question) {
-    const options = safeArray(row.options_json);
-    const normalized = options.length ? options : ["", "", "", ""];
-    setMode("edit");
-    setForm({
-      id: row.id,
-      section: row.section || "APTITUDE",
-      topic_tag: row.topic_tag || "",
-      difficulty: row.difficulty || "EASY",
-      question_text: row.question_text || "",
-      options: normalized.length >= 2 ? normalized : ["", "", "", ""],
-      correct_option: row.correct_option || "A",
-      is_active: !!row.is_active,
-    });
-    setModalMsg(null);
-    setOpen(true);
-  }
+function openEdit(row: Question) {
+  const options = normalizeOptions(row.options_json);
+  const correct = clampCorrectOption(row.correct_option || "A", options.length);
+
+  setMode("edit");
+  setForm({
+    id: row.id,
+    section: row.section || "APTITUDE",
+    topic_tag: row.topic_tag || "",
+    difficulty: row.difficulty || "EASY",
+    question_text: row.question_text || "",
+    options,
+    correct_option: correct,
+    is_active: !!row.is_active,
+  });
+  setModalMsg(null);
+  setOpen(true);
+}
+
 
   function closeModal() {
     setOpen(false);
     setModalMsg(null);
   }
 
-  function validateForm(): string | null {
-    if (!form.section) return "Section is required.";
-    if (!form.topic_tag.trim()) return "Topic tag is required.";
-    if (!form.difficulty) return "Difficulty is required.";
-    if (!form.question_text.trim()) return "Question text is required.";
+function validateForm(): string | null {
+  if (!form.section) return "Section is required.";
+  if (!form.topic_tag.trim()) return "Topic tag is required.";
+  if (!form.difficulty) return "Difficulty is required.";
+  if (!form.question_text.trim()) return "Question text is required.";
 
-    const cleanedOptions = form.options.map((x) => x.trim()).filter(Boolean);
-    if (cleanedOptions.length < 2) return "At least 2 options are required.";
-    if (cleanedOptions.length !== form.options.length) return "Options cannot be empty (remove unused rows).";
+  const optionsTrimmed = form.options.map((x) => x.trim());
 
-    const allowed = ["A", "B", "C", "D", "E", "F"];
-    if (!allowed.includes(form.correct_option)) return "Correct option must be A/B/C/D (or more if you added).";
+  // No empty options
+  const empties = optionsTrimmed.some((x) => !x);
+  if (empties) return "All options must be filled (remove unused rows).";
 
-    const idx = allowed.indexOf(form.correct_option);
-    if (idx < 0 || idx >= form.options.length) {
-      return "Correct option points to a missing option row.";
-    }
+  if (optionsTrimmed.length < 2) return "At least 2 options are required.";
 
-    return null;
-  }
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  const correctIdx = letters.indexOf(form.correct_option);
+
+  if (correctIdx < 0) return "Correct option must be A/B/C/D...";
+  if (correctIdx >= optionsTrimmed.length) return "Correct option points to a missing option.";
+
+  return null;
+}
+
 
   async function save() {
     setModalMsg(null);
@@ -354,52 +394,58 @@ export default function AdminQuestionsPage() {
               </div>
             )}
 
-            {!loading &&
-              items.map((row) => (
-                <div key={row.id} className={styles.row}>
-                  <div>
-                    <div className={styles.cellMain}>#{row.id}</div>
-                    <div className={styles.cellMeta}>{row.difficulty}</div>
-                  </div>
+{!loading &&
+  items.map((row) => {
+    const normalized = normalizeOptions(row.options_json);
+    const filled = normalized.filter((x) => x.trim()).length;
 
-                  <div>
-                    <div className={styles.cellMain}>{row.section}</div>
-                    <div className={styles.cellMeta}>Correct: {row.correct_option}</div>
-                  </div>
+    return (
+      <div key={row.id} className={styles.row}>
+        <div>
+          <div className={styles.cellMain}>#{row.id}</div>
+          <div className={styles.cellMeta}>{row.difficulty}</div>
+        </div>
 
-                  <div>
-                    <div className={styles.cellMain}>{row.topic_tag}</div>
-                    <div className={styles.cellMeta}>
-                      Options: {safeArray(row.options_json).length || "—"}
-                    </div>
-                  </div>
+        <div>
+          <div className={styles.cellMain}>{row.section}</div>
+          <div className={styles.cellMeta}>Correct: {row.correct_option}</div>
+        </div>
 
-                  <div>
-                    <div className={styles.cellMain} style={{ fontWeight: 900 }}>
-                      {row.question_text?.slice(0, 80)}
-                      {row.question_text?.length > 80 ? "…" : ""}
-                    </div>
-                    <div className={styles.cellMeta}>
-                      {row.question_text?.length > 80 ? row.question_text.slice(80, 140) + "…" : ""}
-                    </div>
-                  </div>
+        <div>
+          <div className={styles.cellMain}>{row.topic_tag}</div>
+          <div className={styles.cellMeta}>
+            Options: {filled}/{normalized.length}
+          </div>
+        </div>
 
-                  <div>
-                    <div className={`${styles.badge} ${row.is_active ? styles.badgeOn : styles.badgeOff}`}>
-                      {row.is_active ? "Active" : "Inactive"}
-                    </div>
-                  </div>
+        <div>
+          <div className={styles.cellMain} style={{ fontWeight: 900 }}>
+            {row.question_text?.slice(0, 80)}
+            {row.question_text?.length > 80 ? "…" : ""}
+          </div>
+          <div className={styles.cellMeta}>
+            {row.question_text?.length > 80 ? row.question_text.slice(80, 140) + "…" : ""}
+          </div>
+        </div>
 
-                  <div className={styles.miniActions}>
-                    <button className={styles.btnGhost} onClick={() => openEdit(row)}>
-                      Edit
-                    </button>
-                    <button className={styles.btnDanger} onClick={() => deactivate(row.id)}>
-                      Deactivate
-                    </button>
-                  </div>
-                </div>
-              ))}
+        <div>
+          <div className={`${styles.badge} ${row.is_active ? styles.badgeOn : styles.badgeOff}`}>
+            {row.is_active ? "Active" : "Inactive"}
+          </div>
+        </div>
+
+        <div className={styles.miniActions}>
+          <button className={styles.btnGhost} onClick={() => openEdit(row)}>
+            Edit
+          </button>
+          <button className={styles.btnDanger} onClick={() => deactivate(row.id)}>
+            Deactivate
+          </button>
+        </div>
+      </div>
+    );
+  })}
+
           </div>
         </section>
 

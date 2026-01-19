@@ -255,3 +255,6 @@ export const SkillGap = sequelize.define(
   }
 );
 
+
+
+

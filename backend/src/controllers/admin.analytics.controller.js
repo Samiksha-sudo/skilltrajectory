@@ -1,4 +1,4 @@
-import { sequelize, User, Attempt, AttemptScore, SkillGap } from "../db.js";
+import { sequelize, User, Attempt, Question ,Test } from "../db.js";
 
 export async function adminAnalyticsSummary(req, res) {
   try {
@@ -120,3 +120,36 @@ export async function adminAnalyticsSummary(req, res) {
     return res.status(500).json({ message: "Failed to generate analytics", error: String(e?.message || e) });
   }
 }
+
+export async function adminSummary(req, res) {
+  try {
+    const [
+      usersCount,
+      attemptsCount,
+      questionsCount,
+      activeTest,
+    ] = await Promise.all([
+      User.count(),
+      Attempt.count(),
+      Question.count({ where: { is_active: true } }),
+      Test.findOne({ where: { is_active: true } }),
+    ]);
+
+    res.json({
+      usersCount,
+      attemptsCount,
+      questionsCount,
+      activeTest: activeTest
+        ? {
+            id: activeTest.id,
+            name: activeTest.title,
+            duration: activeTest.duration_minutes,
+          }
+        : null,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to load admin summary" });
+  }
+}
+

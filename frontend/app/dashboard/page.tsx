@@ -67,6 +67,12 @@ export default function DashboardPage() {
     })();
   }, []);
 
+  async function handleLogout() {
+  await fetch("/api/logout", { method: "POST" });
+  window.location.href = "/login";
+}
+
+
   const user = !loading && me && "user" in me ? me.user : null;
 
   // Placeholder metrics for now (S04+ will replace with real data)
@@ -132,6 +138,11 @@ const bestScoreValue =
             <Link className={styles.button} href="/login">
                 Switch User
             </Link>
+
+            <button className={styles.button} onClick={handleLogout}>
+              Logout
+            </button>
+
         </div>
 
         </header>

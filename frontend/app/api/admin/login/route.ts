@@ -10,15 +10,18 @@ export async function POST(req: Request) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      cookie,
-      Accept: "application/json",
-    },
+      cookie: req.headers.get("cookie") || "",
+    }, 
     body,
+     credentials: "include",
   });
 
   const text = await res.text();
   return new NextResponse(text, {
     status: res.status,
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "Set-Cookie": res.headers.get("set-cookie") ?? "",
+    },
   });
 }
