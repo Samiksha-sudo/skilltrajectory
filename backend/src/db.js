@@ -99,3 +99,162 @@ export const AttemptAnswer = sequelize.define("AttemptAnswer", {
   is_correct: { type: DataTypes.BOOLEAN, allowNull: true },
   time_spent_sec: { type: DataTypes.INTEGER, allowNull: true },
 }, { tableName: "attempt_answers", timestamps: false });
+
+export const StudyPlan = sequelize.define(
+  "StudyPlan",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    attempt_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    plan_version: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+    focus_summary: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+  },
+  {
+    tableName: "study_plans",
+    timestamps: false,
+  }
+);
+
+export const StudyPlanWeek = sequelize.define(
+  "StudyPlanWeek",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    plan_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    week_no: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    objective: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    tasks_json: {
+      type: DataTypes.JSON,
+      allowNull: true,
+    },
+    estimated_minutes: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+  },
+  {
+    tableName: "study_plan_weeks",
+    timestamps: false,
+  }
+);
+
+StudyPlan.hasMany(StudyPlanWeek, {
+  foreignKey: "plan_id",
+  as: "weeks",
+});
+
+StudyPlanWeek.belongsTo(StudyPlan, {
+  foreignKey: "plan_id",
+  as: "plan",
+});
+
+
+
+export const StudyProgress = sequelize.define(
+  "StudyProgress",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    plan_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    week_no: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    topic_tag: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    status: {
+      type: DataTypes.ENUM("TODO", "DONE"),
+      defaultValue: "TODO",
+    },
+    completed_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+  },
+  {
+    tableName: "study_progress",
+    timestamps: false,
+    indexes: [
+      {
+        unique: true,
+        fields: ["user_id", "plan_id", "week_no", "topic_tag"],
+      },
+    ],
+  }
+);
+
+
+export const SkillGap = sequelize.define(
+  "SkillGap",
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+
+    attempt_id: { type: DataTypes.INTEGER, allowNull: false },
+    user_id: { type: DataTypes.INTEGER, allowNull: false },
+
+    topic_tag: { type: DataTypes.STRING(100), allowNull: false },
+    section: { type: DataTypes.STRING(50), allowNull: false },
+
+    total_questions: { type: DataTypes.INTEGER, allowNull: false },
+    correct_answers: { type: DataTypes.INTEGER, allowNull: false },
+
+    accuracy_pct: { type: DataTypes.DECIMAL(5,2), allowNull: false },
+    gap_score: { type: DataTypes.DECIMAL(5,2), allowNull: false },
+
+    created_at: { type: DataTypes.DATE },
+  },
+  {
+    tableName: "skill_gaps",
+    timestamps: false,
+  }
+);
+
+
+
+

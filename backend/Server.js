@@ -9,14 +9,16 @@ import testRoutes from "./src/routes/test.routes.js";
 import attemptRoutes from "./src/routes/attempt.routes.js";
 import dashboardRoutes from "./src/routes/dashboard.routes.js";
 import readinessRoutes from "./src/routes/readiness.routes.js";
+import gapsRoutes from "./src/routes/gaps.routes.js";
+import planRoutes from "./src/routes/plan.routes.js";
+import timeEstimateRoutes from "./src/routes/timeEstimate.routes.js";
+import milestonesRoutes from "./src/routes/milestones.routes.js";
+import progressRoutes from "./src/routes/progress.routes.js";
+import adminRoutes from "./src/routes/admin.routes.js";
+import adminQuestionRoutes from "./src/routes/admin.questions.routes.js";
+import adminAnalyticsRoutes from "./src/routes/admin.analytics.routes.js";
 
 
-
-// import adminLoginRouter from './routes/adminLoginRouter.js';
-// import memeberShareRouter from './routes/memeberShareRouter.js';
-// import memberTransactionsRouter from './routes/memberTransactionsRouter.js';
-// import requestLoan from './routes/requestLoan.js';
-// import memberdetails from './routes/memberDetailsRoutes.js';
 
 const PORT = process.env.PORT;
 
@@ -61,7 +63,14 @@ app.use("/api", testRoutes);
 app.use("/api", attemptRoutes);
 app.use("/api", dashboardRoutes);
 app.use("/api", readinessRoutes);
-
+app.use("/api", gapsRoutes);
+app.use("/api", planRoutes);
+app.use("/api", timeEstimateRoutes);
+app.use("/api", milestonesRoutes);
+app.use("/api", progressRoutes);
+app.use("/api", adminRoutes);
+app.use("/api", adminQuestionRoutes);
+app.use("/api", adminAnalyticsRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

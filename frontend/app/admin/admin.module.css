@@ -1,0 +1,223 @@
+.page {
+  position: relative;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px;
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.title {
+  margin: 0;
+  color: white;
+  font-weight: 950;
+  font-size: 34px;
+  letter-spacing: 0.2px;
+}
+
+.subTitle {
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.70);
+  max-width: 720px;
+  line-height: 1.4;
+}
+
+.adminBg {
+  position: relative;
+  min-height: 100vh;
+  background:
+    linear-gradient(
+      rgba(10, 10, 20, 0.78),
+      rgba(10, 10, 20, 0.78)
+    ),
+    url("/admin.jpg") center / cover no-repeat fixed;
+}
+
+.pill {
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: rgba(255,255,255,0.9);
+  font-weight: 800;
+  backdrop-filter: blur(10px);
+}
+
+.grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1.4fr 1fr;
+}
+
+@media (max-width: 940px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  border-radius: 18px;
+  padding: 16px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 18px 60px rgba(0,0,0,0.35);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(59,130,246,0.45), transparent 45%),
+    radial-gradient(circle at 80% 25%, rgba(34,197,94,0.35), transparent 45%),
+    radial-gradient(circle at 50% 85%, rgba(124,58,237,0.45), transparent 45%);
+  filter: blur(14px);
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.cardInner {
+  position: relative;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: rgba(255,255,255,0.95);
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.sectionMeta {
+  margin-top: 6px;
+  color: rgba(255,255,255,0.70);
+  font-size: 13px;
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.kpi {
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.22);
+}
+
+.kpiLabel {
+  font-size: 12px;
+  opacity: 0.75;
+  color: rgba(255,255,255,0.80);
+}
+
+.kpiValue {
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 950;
+  color: white;
+}
+
+.kpiHint {
+  margin-top: 2px;
+  font-size: 12px;
+  opacity: 0.70;
+  color: rgba(255,255,255,0.75);
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.btnPrimary {
+  border: 0;
+  cursor: pointer;
+  border-radius: 14px;
+  padding: 11px 14px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.95);
+  background: linear-gradient(135deg, rgba(59,130,246,0.38), rgba(124,58,237,0.38));
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 18px 50px rgba(124,58,237,0.20);
+  transition: transform 120ms ease, filter 120ms ease, border-color 120ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.btnPrimary:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  border-color: rgba(255,255,255,0.22);
+}
+
+.btnGhost {
+  border-radius: 14px;
+  padding: 11px 14px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  text-decoration: none;
+  transition: transform 120ms ease, border-color 120ms ease;
+}
+
+.btnGhost:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255,255,255,0.20);
+}
+
+.list {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.item {
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.22);
+}
+
+.itemTitle {
+  color: rgba(255,255,255,0.92);
+  font-weight: 900;
+  margin: 0;
+}
+
+.itemMeta {
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.75;
+  color: rgba(255,255,255,0.78);
+}
+
+.error {
+  padding: 12px;
+  margin-top: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(239,68,68,0.30);
+  background: rgba(239,68,68,0.10);
+  color: #fecaca;
+}
