@@ -28,3 +28,4 @@ logs/
 # Sequelize (optional)
 # If you create local sqlite during dev, ignore it:
 *.sqlite
+backend/config/config.json
